@@ -149,3 +149,7 @@ Below is a list of variables available for customizing the container. Variables 
 | `CONTAINER_POST_INIT_SCRIPT`          | Scripts to execute after all services have initialized (comma-separated paths)                                                       |                                    |
 | `TIMEZONE`                            | Set container timezone                                                                                                               | `Etc/GMT`                          |
 
+**Example Usage:**
+To set a post-initialization script:
+```bash
+docker run -e CONTAINER_POST_INIT_SCRIPT="/assets/scripts/init.sh" my-container
