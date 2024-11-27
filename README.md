@@ -153,3 +153,113 @@ Below is a list of variables available for customizing the container. Variables 
 To set a post-initialization script:
 ```bash
 docker run -e CONTAINER_POST_INIT_SCRIPT="/assets/scripts/init.sh" my-container
+```
+
+#### Scheduling Options
+
+This image allows you to execute scheduled tasks at specified times using [cron syntax](https://cron.help/). Currently, the image supports **BusyBox cron** but can be extended to other scheduling backends with minimal effort.
+
+| Parameter                       | Description                           | Default          |
+| ------------------------------- |---------------------------------------| ---------------- |
+| `CONTAINER_ENABLE_SCHEDULING`   | Enable scheduled tasks                | `TRUE`           |
+| `CONTAINER_SCHEDULING_BACKEND`  | Scheduling tool to use (`cron`)       | `cron`           |
+| `CONTAINER_SCHEDULING_LOCATION` | Directory for cron task files         | `/assets/cron/`  |
+| `SCHEDULING_LOG_TYPE`           | Log type (`FILE`)                     | `FILE`           |
+| `SCHEDULING_LOG_LOCATION`       | Log file location                     | `/var/log/cron/` |
+| `SCHEDULING_LOG_LEVEL`          | Log level (`1` = loud to `8` = quiet) | `6`              |
+
+**Note:** Only BusyBox cron is supported by default. To use other scheduling backends, you may need additional configuration.
+
+##### Cron Options
+
+You can define cron jobs in two ways:
+1. Drop files into `/assets/cron/`. These will be parsed when the container starts.
+2. Use environment variables prefixed with `CRON_`.
+
+| Parameter | Description                                                           | Default |
+| --------- |-----------------------------------------------------------------------| ------- |
+| `CRON_*`  | Name of the job, followed by the cron schedule and command to execute | ``      |
+
+**Example Usage:**
+```bash
+# Add a cron job to run every minute
+CRON_HELLO="* * * * * echo 'hello' > /tmp/hello.log"
+```
+
+**Disabling Cron Jobs:**
+If a cron job is baked into the parent Docker image, you can override it by:
+- Replacing it with your own value.
+- Disabling it entirely by setting its value to `FALSE`.
+
+Example:
+```bash
+CRON_HELLO=FALSE
+```
+
+#### Messaging Options
+
+To enable email messaging capabilities, set `CONTAINER_ENABLE_MESSAGING=TRUE` and configure the following environment variables. Currently, only the `msmtp` backend is supported, but others can be added easily.
+
+| Parameter                     | Description                                | Default |
+| ----------------------------- | ------------------------------------------ | ------- |
+| `CONTAINER_ENABLE_MESSAGING`  | Enable messaging services like SMTP        | `TRUE`  |
+| `CONTAINER_MESSAGING_BACKEND` | Messaging backend to use (e.g., `msmtp`)   | `msmtp` |
+
+##### SMTP Configuration
+
+To configure `msmtp` for sending emails, set the required SMTP parameters in your environment. Refer to the [MSMTP Configuration Options](https://marlam.de/msmtp/msmtp.html) for detailed documentation.
+
+| Parameter                  | Description                                                                     | Default         | `_FILE` |
+| -------------------------- |---------------------------------------------------------------------------------| --------------- | ------- |
+| `SMTP_AUTO_FROM`           | Automatically set the sender based on the email address (useful for Gmail SMTP) | `FALSE`         |         |
+| `SMTP_HOST`                | Hostname of the SMTP server                                                     | `postfix-relay` | x       |
+| `SMTP_PORT`                | Port number of the SMTP server                                                  | `25`            | x       |
+| `SMTP_DOMAIN`              | HELO/EHLO domain to identify the client                                         | `docker`        |         |
+| `SMTP_MAILDOMAIN`          | Domain to use in the `From` field                                               | `local`         |         |
+| `SMTP_AUTHENTICATION`      | Authentication type (`none`, `plain`, `login`, or `cram-md5`)                   | `none`          |         |
+| `SMTP_USER`                | Username for SMTP authentication                                                | ``              | x       |
+| `SMTP_PASS`                | Password for SMTP authentication                                                | ``              | x       |
+| `SMTP_TLS`                 | Enable TLS encryption (`TRUE` or `FALSE`)                                       | `FALSE`         |         |
+| `SMTP_STARTTLS`            | Enable STARTTLS within the session (`TRUE` or `FALSE`)                          | `FALSE`         |         |
+| `SMTP_TLSCERTCHECK`        | Verify the remote certificate when using TLS                                    | `FALSE`         |         |
+| `SMTP_ALLOW_FROM_OVERRIDE` | Allow overriding the `From` address manually                                    | ``              |         |
+
+Example Usage:
+To configure SMTP with TLS:
+```bash
+docker run \
+    -e SMTP_HOST=smtp.gmail.com \
+    -e SMTP_PORT=587 \
+    -e SMTP_USER=myemail@gmail.com \
+    -e SMTP_PASS=mysecurepassword \
+    -e SMTP_TLS=TRUE \
+    -e SMTP_STARTTLS=TRUE \
+    my-container
+```
+
+Example with Plain Authentication:
+For servers not requiring TLS or STARTTLS:
+```bash
+docker run \
+    -e SMTP_HOST=mail.example.com \
+    -e SMTP_PORT=25 \
+    -e SMTP_AUTHENTICATION=plain \
+    -e SMTP_USER=myuser \
+    -e SMTP_PASS=myplainpassword \
+    my-container
+```
+
+Security Recommendations:
+- Always use `_FILE` variables (e.g., `SMTP_USER_FILE`, `SMTP_PASS_FILE`) to store sensitive information in files rather than passing them directly as environment variables.
+- Example for using `_FILE` variables:
+```bash
+docker run \
+    -e SMTP_USER_FILE=/run/secrets/smtp_user \
+    -e SMTP_PASS_FILE=/run/secrets/smtp_pass \
+    my-container
+```
+
+Additional Notes:
+- For Gmail SMTP, ensure `SMTP_AUTO_FROM=TRUE` and the email address matches the sender domain.
+- For advanced configuration and troubleshooting, see the [MSMTP Configuration Options](https://marlam.de/msmtp/msmtp.html).
+- To integrate with Zabbix, refer to the [Official Zabbix Agent Documentation](https://www.zabbix.com/documentation/5.4/manual/appendix/config/zabbix_agentd).
