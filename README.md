@@ -14,9 +14,8 @@
 1. [About](#about)
 2. [Features](#features)
 3. [Installation](#installation)
-    - [Build from Source](#build-from-source)
-    - [Prebuilt Images](#prebuilt-images)
-    - [Multi Architecture Support](#multi-architecture-support)
+   - [Getting Started](#getting-started)
+   - [Multi Architecture Support](#multi-architecture-support)
 4. [Available Tags](#available-tags)
 
 ---
@@ -42,27 +41,32 @@ A lightweight and flexible [Alpine Linux](https://www.alpinelinux.org/) containe
 
 ## Installation
 
-### Build from Source
-To build the image locally:
+### Getting Started
+You can use this image either by building it locally or pulling prebuilt images from trusted registries.
+
+#### Build from Source
+If you want to build the image locally:
 ```bash
 docker build <arguments> (imagename) .
 ```
 
-### Prebuilt Images
-Prebuilt images are available on [Docker Hub](https://hub.docker.com/r/focela/alpine):
-```bash
-docker pull docker.io/focela/alpine:(imagetag)
-```
+#### Prebuilt Images
+Prebuilt images are available in the following registries:
 
-Alternatively, images are also hosted on the [GitHub Container Registry](https://github.com/focela/docker-alpine/pkgs/container/docker-alpine):
-```bash
-docker pull ghcr.io/focela/alpine:(imagetag)
-```
+- **Docker Hub**:
+  ```bash
+  docker pull docker.io/focela/alpine:(imagetag)
+  ```
 
----
+- **GitHub Container Registry**:
+  ```bash
+  docker pull ghcr.io/focela/alpine:(imagetag)
+  ```
 
 ### Multi Architecture Support
-This image primarily supports `amd64` architecture. Variants for `arm/v7`, `arm64`, and others may be available but are unsupported. To verify architecture compatibility:
+This image is primarily built for `amd64` architecture. Variants for `arm/v7`, `arm64`, and others are available but not officially supported.
+
+To verify the architecture compatibility of a specific image:
 ```bash
 docker manifest inspect (image):(tag)
 ```
@@ -92,4 +96,3 @@ docker manifest inspect (image):(tag)
 | `3.5`          | `:3.5`  |
 
 ---
-
