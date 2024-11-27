@@ -101,50 +101,51 @@ docker manifest inspect (image):(tag)
 
 ### Quick Start
 
-Utilize this image as a base for further builds. Please visit the [s6 overlay repository](https://github.com/just-containers/s6-overlay) for
-instructions on how to enable the S6 init system when using this base or look at some of my other images
-which use this as a base.
+Use this image as a base for your builds. For more details on enabling the S6 init system, visit the [s6 overlay repository](https://github.com/just-containers/s6-overlay). You can also refer to other images based on this setup for additional examples.
 
 ### Persistent Storage
 
-The following directories are used for configuration and can be mapped for persistent storage.
+The following directories can be mapped to the host machine to retain configuration and log files:
 
 | Directory                           | Description                               |
 | ----------------------------------- | ----------------------------------------- |
 | `/etc/fluent-bit/conf.d/`           | Fluent-Bit custom configuration directory |
 | `/etc/fluent-bit/parsers.d/`        | Fluent-Bit custom parsers directory       |
 | `/etc/zabbix/zabbix_agentd.conf.d/` | Zabbix Agent configuration directory      |
-| `/etc/fail2ban/filter.d`            | Custom Fail2ban Filter configuration      |
-| `/etc/fail2ban/jail.d`              | Custom Fail2ban Jail configuration        |
-| `/var/log`                          | Container, Cron, Zabbix, other log files  |
+| `/etc/fail2ban/filter.d`            | Custom Fail2ban filter configuration      |
+| `/etc/fail2ban/jail.d`              | Custom Fail2ban jail configuration        |
+| `/var/log`                          | Logs for container, cron, Zabbix, etc.    |
 | `/assets/cron`                      | Drop custom crontabs here                 |
 | `/assets/iptables`                  | Drop custom IPTables rules here           |
 
+**Note:** Mapping these directories ensures data persistence between container restarts.
+
 ### Environment Variables
 
-Below is the complete list of available options that can be used to customize your installation.
-Variables showing an 'x' under the `_FILE` column can be used for storing the information inside of a file, useful for secrets.
+Below is a list of variables available for customizing the container. Variables marked with 'x' in the `_FILE` column can load values from files, which is useful for managing sensitive information.
 
-#### Container Options
+#### **Container Options**
+
 | Parameter                             | Description                                                                                                                           | Default                            |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `CONAINER_ENABLE_LOG_TIMESTAMP`       | Prefix this images container logs with timestamp                                                                                      | `TRUE`                             |
+| `CONTAINER_ENABLE_LOG_TIMESTAMP`      | Add timestamps to container logs                                                                                                      | `TRUE`                             |
 | `CONTAINER_COLORIZE_OUTPUT`           | Enable/Disable colorized console output                                                                                               | `TRUE`                             |
-| `CONTAINER_CUSTOM_BASH_PROMPT`        | If you wish to set a different bash prompt then '(imagename):(version) HH:MM:SS # '                                                   |                                    |
-| `CONTAINER_CUSTOM_PATH`               | Used for adding custom files into the image upon startup                                                                              | `/assets/custom`                   |
-| `CONTAINER_CUSTOM_SCRIPTS_PATH`       | Used for adding custom scripts to execute upon startup                                                                                | `/assets/custom-scripts`           |
-| `CONTAINER_ENABLE_PROCESS_COUNTER`    | Show how many times process has executed in console log                                                                               | `TRUE`                             |
-| `CONTAINER_LOG_LEVEL`                 | Control level of output of container `INFO`, `WARN`, `NOTICE`, `DEBUG`                                                                | `NOTICE`                           |
-| `CONTAINER_LOG_PREFIX_TIME_FMT`       | Timestamp Time Format                                                                                                                 | `%H:%M:%S`                         |
-| `CONTAINER_LOG_PREFIX_DATE_FMT`       | Timestamp Date Format                                                                                                                 | `%Y-%m-%d`                         |
-| `CONTAINER_LOG_PREFIX_SEPERATOR`      | Timestamp seperator                                                                                                                   | `-`                                |
-| `CONTAINER_LOG_FILE_LEVEL`            | Control level of output of container `INFO`, `WARN`, `NOTICE`, `DEBUG`                                                                | `DEBUG`                            |
-| `CONTAINER_LOG_FILE_NAME`             | Internal Container Logs filename                                                                                                      | `/var/log/container/container.log` |
-| `CONTAINER_LOG_FILE_PATH`             | Path where to find the internal container logs                                                                                        | `/var/log/container/`              |
-| `CONTAINER_LOG_FILE_PREFIX_TIME_FMT`  | Timestamp Time Format                                                                                                                 | `%H:%M:%S`                         |
-| `CONTAINER_LOG_FILE_PREFIX_DATE_FMT`  | Timestamp Date Format                                                                                                                 | `%Y-%m-%d`                         |
-| `CONTAINER_LOG_FILE_PREFIX_SEPERATOR` | Timestamp seperator                                                                                                                   | `-`                                |
-| `CONTAINER_NAME`                      | Used for setting entries in Monnitoring and Log Shipping                                                                              | (hostname)                         |
-| `CONTAINER_POST_INIT_COMMAND`         | If you wish to execute a command in the container after all services have initialized enter it here. Seperate multiple by commas      |                                    |
-| `CONTAINER_POST_INIT_SCRIPT`          | If you wish to execute a script in the container after all services have initialized enter the path here. Seperate multiple by commas |                                    |
-| `TIMEZONE`                            | Set Timezone                                                                                                                          | `Etc/GMT`                          |
+| `CONTAINER_CUSTOM_BASH_PROMPT`        | Set a custom bash prompt (e.g., '(imagename):(version) HH:MM:SS # ')                                                                  |                                    |
+| `CONTAINER_CUSTOM_PATH`               | Path to custom files loaded at startup                                                                                               | `/assets/custom`                   |
+| `CONTAINER_CUSTOM_SCRIPTS_PATH`       | Path to custom scripts executed at startup                                                                                           | `/assets/custom-scripts`           |
+| `CONTAINER_ENABLE_PROCESS_COUNTER`    | Display the execution count of a process in logs                                                                                     | `TRUE`                             |
+| `CONTAINER_LOG_LEVEL`                 | Log level (`INFO`, `WARN`, `NOTICE`, `DEBUG`)                                                                                        | `NOTICE`                           |
+| `CONTAINER_LOG_PREFIX_TIME_FMT`       | Format for log timestamps (time)                                                                                                      | `%H:%M:%S`                         |
+| `CONTAINER_LOG_PREFIX_DATE_FMT`       | Format for log timestamps (date)                                                                                                      | `%Y-%m-%d`                         |
+| `CONTAINER_LOG_PREFIX_SEPERATOR`      | Separator for timestamp components                                                                                                    | `-`                                |
+| `CONTAINER_LOG_FILE_LEVEL`            | Log level for internal container logs                                                                                                | `DEBUG`                            |
+| `CONTAINER_LOG_FILE_NAME`             | File name for container logs                                                                                                         | `/var/log/container/container.log` |
+| `CONTAINER_LOG_FILE_PATH`             | Path for container logs                                                                                                              | `/var/log/container/`              |
+| `CONTAINER_LOG_PREFIX_TIME_FMT`       | Format for log timestamps (time)                                                                                                      | `%H:%M:%S`                         |
+| `CONTAINER_LOG_PREFIX_DATE_FMT`       | Format for log timestamps (date)                                                                                                      | `%Y-%m-%d`                         |
+| `CONTAINER_LOG_PREFIX_SEPARATOR`      | Separator for timestamp components                                                                                                    | `-`                                
+| `CONTAINER_NAME`                      | Custom container name for monitoring and log shipping                                                                                | (hostname)                         |
+| `CONTAINER_POST_INIT_COMMAND`         | Commands to run after all services have initialized (comma-separated)                                                                |                                    |
+| `CONTAINER_POST_INIT_SCRIPT`          | Scripts to execute after all services have initialized (comma-separated paths)                                                       |                                    |
+| `TIMEZONE`                            | Set container timezone                                                                                                               | `Etc/GMT`                          |
+
